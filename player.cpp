@@ -9,17 +9,24 @@ Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
 
-    /*
-     * TODO: Do any initialization you need to do here (setting up the board,
-     * precalculating things, etc.) However, remember that you will only have
-     * 30 seconds.
-     */
+    this->game_board = new Board();
+
+    // Initialize the vector of adjacents
+    static const Move init_adj[] = {Move(2,2), Move(3,2), Move(4,2), Move(5,2),
+                                    Move(2,3),                       Move(5,3),
+                                    Move(2,4),                       Move(5,4),
+                                    Move(2,5), Move(3,5), Move(4,5), Move(5,5)};
+    this->adjacent_sq = vector<Move>(init_adj,
+      init_adj + sizeof(init_adj)/sizeof(init_adj[0]));
+
+    return;
 }
 
 /*
  * Destructor for the player.
  */
 Player::~Player() {
+    delete game_board;
 }
 
 /*
@@ -41,4 +48,16 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */
     return nullptr;
+}
+
+Move *Player::randomMove() {
+
+}
+
+Move *Player::miniMax() {
+
+}
+
+void Player::updateAdjacents(Move *m) {
+
 }
