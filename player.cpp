@@ -50,14 +50,26 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     return nullptr;
 }
 
+/**
+ * @brief Makes a random move.
+ *
+ */
 Move *Player::randomMove() {
 
 }
 
+/**
+ * @brief Makes a non-random move determined by using MiniMax.
+ *
+ */
 Move *Player::miniMax() {
 
 }
 
+/**
+ * @brief Updates the list of valid adjacent moves.
+ *
+ */
 void Player::updateAdjacents(Move *m) {
 
 }
