@@ -28,15 +28,21 @@ public:
     ~Player();
 
     Move *doMove(Move *opponentsMove, int msLeft);
+
     int Player::updateHueristics(Board *board);
+    int randomMove();
+    Move *miniMax();
+    void updateOurMove(int index);
+    void updateTheirMove(Move *m)
+
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
 
 private:
-    // Game board pointer
+    // The Game Board
     Board game_board*;
-    // The side of the player
+    // The Player's side
     Side player_side;
     // Valid moves
     vector<Move> valid_moves;

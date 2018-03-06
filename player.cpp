@@ -20,6 +20,7 @@ Player::Player(Side side) {
                                     Move(2,4),                       Move(5,4),
                                     Move(2,5), Move(3,5), Move(4,5), Move(5,5)};
     static const short NUM_ADJACENT_INITIAL = 12;
+    static const short NUM_ADJACENT_MOVE = 8;
 
     // Only keep valid moves and add to vector of valid moves
     for(short i = 0; i < NUM_ADJACENT_INITIAL; i++) {
@@ -77,13 +78,13 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
  * @brief Makes a random move.
  *
  */
-Move *Player::randomMove() {
+int Player::randomMove() {
     /*
-     * Makes a ,,random,, move. Some moves are likelier to be made...don't
+     * Picks a ,,random,, move. Some moves are likelier to be made...don't
      * worry about it.
      */
-    int randIndex = rand() % adjacent_sq.size();
-    game_board.doMove(adjacent_sq[randIndex], side);
+    int randIndex = rand() % valid_moves.size();
+    return randIndex;
 }
 
 /**
@@ -95,11 +96,42 @@ Move *Player::miniMax() {
 }
 
 /**
- * @brief Updates the list of valid adjacent moves.
+ * @brief Updates the list of valid adjacent moves after our move.
  *
  */
-void Player::updateAdjacents(Move *m) {
+void Player::updateOurMove(int index) {
+    int x = valid_moves[index].getX();
+    int y = valid_moves[index].getY();
+    valid_moves.erase(valid_moves.begin() + index);
+    Move adj[] = {Move(x-1,y-1), Move(x,y-1), Move(x+1,y-1),
+                  Move(x-1,y),                Move(x+1,y),
+                  Move(x-1,y+1), Move(x,y+1), Move(x+1,y+1)};
+    for(short i = 0; i < NUM_ADJACENT_MOVE; i++) {
+      if(onBoard(&adj[i].getX(), &adj[i].getY())) {
+        if(game_board->checkMove(&adj[i], this->player_side)) {
+          this->valid_moves.pushback(adj[i]);
+        }
+      }
+    }
+}
 
+/**
+ * @brief Updates the list of valid adjacent moves after their move.
+ *
+ */
+void Player::updateTheirMove(Move *m) {
+    int x = m.getX();
+    int y = m.getY();
+    Move adj[] = {Move(x-1,y-1), Move(x,y-1), Move(x+1,y-1),
+                  Move(x-1,y),                Move(x+1,y),
+                  Move(x-1,y+1), Move(x,y+1), Move(x+1,y+1)};
+    for(short i = 0; i < NUM_ADJACENT_MOVE; i++) {
+      if(onBoard(&adj[i].getX(), &adj[i].getY())) {
+        if(game_board->checkMove(&adj[i], this->player_side)) {
+          this->valid_moves.pushback(adj[i]);
+        }
+      }
+    }
 }
 
 /**
