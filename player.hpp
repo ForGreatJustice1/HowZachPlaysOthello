@@ -19,6 +19,7 @@ public:
 
 private:
     Board game_board*;
+    Side player_side;
     vector<Move> adjacent_sq;
 };
 
