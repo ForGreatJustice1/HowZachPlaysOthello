@@ -358,8 +358,13 @@ int Player::updateHeuristics(Board *board, vector<Move *> token_spaces) {
         their_score += HEURISTIC[x][y];
       }
     }
+    int aggregate = our_score - their_score;
 
-    return our_score - their_score;
+    int our_mobility = get_valid_moves(board, this->player_side).size();
+    int their_mobility = get_valid_moves(board, this->op_side).size();
+    int mobility_score = our_mobility - their_mobility;
+
+    return 4 * mobility_score + aggregate;
 }
 
 int Player::flatHeuristic(int x, int y) {
