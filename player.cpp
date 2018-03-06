@@ -213,14 +213,19 @@ int Player::updateHeuristics(Board *board) {
  *
  */
  int Player::heuristicsAI(Move *theirMove) {
-     int hScore;
-     int currentScore =;
+     int hScore = -10000;
+     int currentScore;
      int hIndex;
      updateTheirMove(theirMove);
      for(int i = 0; i < valid_moves.size(); i++) {
        Board newCopy = this->game_board->copy();
        newCopy->doMove(valid_moves[i]);
        currentScore = updateHeuristics(newCopy);
-       if
+       if(currentScore > hScore) {
+         hIndex = i;
+         hScore = currentScore;
+       }
+       delete newCopy;
      }
+     return hIndex;
  }
