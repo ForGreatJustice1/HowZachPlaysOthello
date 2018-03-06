@@ -207,3 +207,15 @@ int Player::updateHueristics(Board *board) {
 
     return out_score - their_score;
 }
+
+/**
+ * @brief Calculates a simple heuristic
+ *
+ * @return The hueristic function's value given a board state.
+ */
+int Player::superDumbSuperSimpleHeuristic(Board *board) {
+    if(this->player_side == BLACK){
+      return board->countBlack() - board->countWhite();
+    }
+    return board->countWhite() - board->countBlack();
+}

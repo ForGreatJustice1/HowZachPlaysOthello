@@ -39,6 +39,7 @@ public:
     Move *doMove(Move *opponentsMove, int msLeft);
 
     int Player::updateHueristics(Board *board);
+    int Player::superDumbSuperSimpleHeuristic(Board *board);
     int randomMove();
     Move *miniMax();
     void updateOurMove(int index);
