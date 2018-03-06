@@ -72,36 +72,36 @@ Player::~Player() {
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
     Player::updateTheirMove(opponentsMove);
-    int outMoveIndex;
+    int ourMoveIndex;
 
     // Figure out what AI to use
     if(testingMinimax) {
-      outMoveIndex = this->miniMax();
+      ourMoveIndex = this->miniMax();
     }
     else {
       switch(this->AI_type) {
         case RANDOM_AI:
         {
-          outMoveIndex = this->randomMove();
+          ourMoveIndex = this->randomMove();
         }
         case HEURISTIC_AI:
         {
-          // TODO: Add HEURISTIC_AI function
+          ourMoveIndex = this->heuristicsAI();
         }
         case MINIMAX_AI:
         {
-          outMoveIndex = this->miniMax();
+          ourMoveIndex = this->miniMax();
         }
         default:
         {
-          outMoveIndex = this->randomMove();
+          ourMoveIndex = this->randomMove();
           break;
         }
       }
     }
 
-    Player::updateOurMove(outMoveIndex);
-    return ourMove;
+    Player::updateOurMove(ourMoveIndex);
+    return valid_moves[index];
 }
 
 /**
@@ -122,7 +122,7 @@ int Player::randomMove() {
  *
  */
 Move *Player::miniMax() {
-
+  return NULL;
 }
 
 /**
@@ -224,11 +224,10 @@ int Player::superDumbSuperSimpleHeuristic(Board *board) {
  * @brief Uses heuristics to make the immediate best move.
  *
  */
- int Player::heuristicsAI(Move *theirMove) {
+int Player::heuristicsAI() {
      int hScore = -10000;
      int currentScore;
      int hIndex;
-     updateTheirMove(theirMove);
      for(int i = 0; i < valid_moves.size(); i++) {
        Board newCopy = this->game_board->copy();
        newCopy->doMove(valid_moves[i]);

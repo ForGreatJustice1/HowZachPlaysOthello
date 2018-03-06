@@ -40,10 +40,12 @@ public:
 
     int updateHueristics(Board *board);
     int superDumbSuperSimpleHeuristic(Board *board);
-    int randomMove();
-    Move *miniMax();
     void updateOurMove(int index);
     void updateTheirMove(Move *m)
+
+    int randomMove();
+    int heuristicsAI();
+    int miniMax();
 
 
     // Flag to tell if the player is running within the test_minimax context
