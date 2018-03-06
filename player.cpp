@@ -72,17 +72,17 @@ Player::~Player() {
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
     Player::updateTheirMove(opponentsMove);
-    Move *outMove;
+    int outMoveIndex;
 
     // Figure out what AI to use
     if(testingMinimax) {
-      outMove = this->miniMax();
+      outMoveIndex = this->miniMax();
     }
     else {
       switch(this->AI_type) {
         case RANDOM_AI:
         {
-          outMove = this->randomMove();
+          outMoveIndex = this->randomMove();
         }
         case HEURISTIC_AI:
         {
@@ -90,17 +90,17 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
         }
         case MINIMAX_AI:
         {
-          outMove = this->miniMax();
+          outMoveIndex = this->miniMax();
         }
         default:
         {
-          outMove = this->randomMove();
+          outMoveIndex = this->randomMove();
           break;
         }
       }
     }
 
-    Player::updateOurMove(ourMove);
+    Player::updateOurMove(outMoveIndex);
     return ourMove;
 }
 
