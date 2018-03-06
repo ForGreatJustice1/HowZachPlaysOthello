@@ -63,7 +63,7 @@ Move *Player::randomMove() {
      * worry about it.
      */
     int randIndex = rand() % adjacent_sq.size();
-    game_board.doMove(adjacent_sq[randIndex], side);
+    return adjacent_sq[randIndex];
 }
 
 /**
@@ -78,6 +78,6 @@ Move *Player::miniMax() {
  * @brief Updates the list of valid adjacent moves.
  *
  */
-void Player::updateAdjacents(Move *m) {
+void Player::updateValidMoves(Move *m, int index) {
 
 }
