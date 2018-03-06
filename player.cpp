@@ -185,26 +185,27 @@ int Player::flatEarthHeuristicAI() {
     return hIndex;
 }
 
+// Struct for doing the minimax calculations
+typedef struct search_state {
+  int move_index;
+  Move *next_move;
+  Board *board;
+  int depth;
+  bool player_turn;
+} search_state_t;
+
 /**
  * @brief Makes a non-random move determined by using MiniMax.
  *
  */
 int Player::miniMax(int ply) {
+
     int num_val_moves = this->valid_moves.size();
     std::vector<int> min_score;
 
     for(int i = 0; i < num_val_moves; i++) {
       min_score.push_back(65);
     }
-
-    // Struct for doing the minimax calculations
-    typedef struct search_state {
-      int move_index;
-      Move next_move;
-      Board *board;
-      int depth;
-      bool player_turn;
-    } search_state_t;
 
     std::vector<search_state_t> searches;
 
@@ -213,7 +214,7 @@ int Player::miniMax(int ply) {
 
       search_state_t state;
       state.move_index = i;
-      state.next_move = this->valid_moves[i];
+      state.next_move = &(this->valid_moves[i]);
       state.board = this->game_board->copy();
       state.depth = 1;
       state.player_turn = true;
@@ -223,10 +224,11 @@ int Player::miniMax(int ply) {
 
     // Go through moves
     while(searches.size() > 0) {
-      search_state_t current_state = searches.pop_back();
+      search_state_t current_state = searches[searches.size() - 1];
+      searches.pop_back();
 
-      Side s = (state.player_turn)? this->player_side : this->op_side;
-      current_state.board->doMove(&current_state.next_move, s);
+      Side s = (current_state.player_turn)? this->player_side : this->op_side;
+      current_state.board->doMove(current_state.next_move, s);
 
       // Case where we have reached the depth we want.
       if(current_state.depth == ply) {
@@ -237,15 +239,16 @@ int Player::miniMax(int ply) {
       }
       // Continue calculating
       else {
-        Side next_side = (!state.player_turn)? this->player_side:this->op_side;
+        Side next_side = (!current_state.player_turn)?
+          this->player_side:this->op_side;
         std::vector<Move> next_moves =
           get_valid_moves(current_state.board, next_side);
 
-        for(int i = 0; i < next_moves.size(); i++) {
+        for(int i = 0; i < (int)next_moves.size(); i++) {
           // Create all of the next states to look at and push them in.
           search_state_t next_state;
           next_state.move_index = current_state.move_index;
-          next_state.next_move = next_moves[i];
+          next_state.next_move = &next_moves[i];
           next_state.board = current_state.board->copy();
           next_state.depth = current_state.depth + 1;
           next_state.player_turn = !current_state.player_turn;
