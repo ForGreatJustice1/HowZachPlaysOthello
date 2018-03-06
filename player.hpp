@@ -9,7 +9,7 @@
 
 using namespace std;
 
-static const short HUERISTIC[NUM_OTHELLO_SQUARES][NUM_OTHELLO_SQUARES] =
+static const short HEURISTIC[NUM_OTHELLO_SQUARES][NUM_OTHELLO_SQUARES] =
 {
   {  127, -064,  064,  064,  064,  064, -064,  127},
   { -064, -127, -032,  000,  000, -032, -127, -064},
