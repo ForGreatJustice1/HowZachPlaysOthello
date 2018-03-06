@@ -1,6 +1,3 @@
-#ifndef __PLAYER_H__
-#define __PLAYER_H__
-
 #include <iostream>
 #include <vector>
 #include "common.hpp"
@@ -12,14 +9,14 @@ using namespace std;
 
 static const short HEURISTIC[NUM_OTHELLO_SQUARES][NUM_OTHELLO_SQUARES] =
 {
-  {  127, -064,  064,  064,  064,  064, -064,  127},
-  { -064, -127, -032,  000,  000, -032, -127, -064},
-  {  064, -032,  016,  016,  016,  016, -032,  064},
-  {  064,  000,  016,  032,  032,  016,  000,  064},
-  {  064,  000,  016,  032,  032,  016,  000,  064},
-  {  064, -032,  016,  016,  016,  016, -032,  064},
-  { -064, -127, -032,  000,  000, -032, -127, -064},
-  {  127, -064,  064,  064,  064,  064, -064,  127}
+  {  255,  -64,   32,   16,   16,   32,  -64,  255},
+  {  -64, -128,   32,    4,    4,   32, -128,  -64},
+  {   32,   32,   32,    4,    4,   32,   32,   32},
+  {   16,    4,    4,    4,    4,    4,    4,   16},
+  {   16,    4,    4,    4,    4,    4,    4,   16},
+  {   32,   32,   32,    4,    4,   32,   32,   32},
+  {  -64, -128,   32,    4,    4,   32, -128,  -64},
+  {  255,  -64,   32,   16,   16,   32,  -64,  255}
 };
 
 /**
@@ -28,7 +25,8 @@ static const short HEURISTIC[NUM_OTHELLO_SQUARES][NUM_OTHELLO_SQUARES] =
 typedef enum AI {
   RANDOM_AI,
   HEURISTIC_AI,
-  MINIMAX_AI
+  MINIMAX_AI,
+  FLAT_AI
 } AI_t;
 
 class Player {
@@ -39,15 +37,17 @@ public:
 
     Move *doMove(Move *opponentsMove, int msLeft);
 
-    int updateHeuristics(Board *board);
+    int updateHeuristics(Board *board, vector<Move *> token_spaces);
     int superDumbSuperSimpleHeuristic(Board *board);
     void updateMoves(Move *m);
     void updateOurMove(int index);
     void updateTheirMove(Move *m);
     void clearNeighborsFromMoves(int x, int y);
+    int flatHeuristic(int x, int y);
 
     int randomMove();
     int heuristicsAI();
+    int flatEarthHeuristicAI();
     int miniMax();
 
 
@@ -68,5 +68,3 @@ private:
     // Occupied spaces
     std::vector<Move *> occupied_spaces;
 };
-
-#endif

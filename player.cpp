@@ -23,7 +23,7 @@ Player::Player(Side side) {
     testingMinimax = false;
 
     // Set the AI type
-    this->AI_type = RANDOM_AI;
+    this->AI_type = HEURISTIC_AI;
 
     this->player_side = side;
     this->op_side = (side == BLACK)? WHITE : BLACK;
@@ -94,14 +94,22 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
         case RANDOM_AI:
         {
           ourMoveIndex = this->randomMove();
+          break;
         }
         case HEURISTIC_AI:
         {
           ourMoveIndex = this->heuristicsAI();
+          break;
         }
         case MINIMAX_AI:
         {
           ourMoveIndex = this->miniMax();
+          break;
+        }
+        case FLAT_AI:
+        {
+          ourMoveIndex = this->flatEarthHeuristicAI();
+          break;
         }
         default:
         {
@@ -137,19 +145,43 @@ int Player::randomMove() {
 *
 */
 int Player::heuristicsAI() {
-    int hScore = -10000;
+    int hScore = -1000;
     int currentScore;
     int hIndex;
     for(int i = 0; i < (int)valid_moves.size(); i++) {
       Board* newCopy = this->game_board->copy();
       newCopy->doMove(&valid_moves[i], this->player_side);
-      currentScore = updateHeuristics(newCopy);
+      this->occupied_spaces.push_back(&valid_moves[i]);
+      currentScore = updateHeuristics(newCopy, this->occupied_spaces);
+      this->occupied_spaces.pop_back();
       if(currentScore > hScore) {
         hIndex = i;
         hScore = currentScore;
       }
       delete newCopy;
     }
+
+    return hIndex;
+}
+
+/**
+* @brief Uses heuristics to make the immediate best move.
+*
+*/
+int Player::flatEarthHeuristicAI() {
+    int hScore = -1000;
+    int currentScore;
+    int hIndex;
+    for(int i = 0; i < (int)valid_moves.size(); i++) {
+      int x = valid_moves[i].getX();
+      int y = valid_moves[i].getY();
+      currentScore = flatHeuristic(x,y);
+      if(currentScore > hScore) {
+        hIndex = i;
+        hScore = currentScore;
+      }
+    }
+
     return hIndex;
 }
 
@@ -223,23 +255,28 @@ void Player::updateMoves(Move *m) {
  *
  * @return The hueristic function's value given a board state.
  */
-int Player::updateHeuristics(Board *board) {
+int Player::updateHeuristics(Board *board, vector<Move *> token_spaces) {
     int our_score = 0;
     int their_score = 0;
-    Side player = this->player_side;
-    Side opponent = this->op_side;
-    for(int i = 0; i < (int)this->occupied_spaces.size(); i++) {
-      int x = this->occupied_spaces[i]->getX();
-      int y = this->occupied_spaces[i]->getY();
-      if(this->game_board->get(player, x, y)) {
+
+    for(int i = 0; i < (int)token_spaces.size(); i++) {
+
+      int x = token_spaces[i]->getX();
+      int y = token_spaces[i]->getY();
+
+      if(board->get(this->player_side, x, y)) {
         our_score += HEURISTIC[x][y];
       }
-      else if(this->game_board->get(opponent, x, y)) {
+      else if(board->get(this->op_side, x, y)) {
         their_score += HEURISTIC[x][y];
       }
     }
 
     return our_score - their_score;
+}
+
+int Player::flatHeuristic(int x, int y) {
+    return HEURISTIC[x][y];
 }
 
 /**
