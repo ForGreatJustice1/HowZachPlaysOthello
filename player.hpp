@@ -2,6 +2,7 @@
 #define __PLAYER_H__
 
 #include <iostream>
+#include <vector>
 #include "common.hpp"
 #include "board.hpp"
 
@@ -25,9 +26,9 @@ static const short HEURISTIC[NUM_OTHELLO_SQUARES][NUM_OTHELLO_SQUARES] =
  * @brief Tells what type of AI to use.
  */
 typedef enum AI {
-  RANDOM_AI;
-  HEURISTIC_AI;
-  MINIMAX_AI;
+  RANDOM_AI,
+  HEURISTIC_AI,
+  MINIMAX_AI
 } AI_t;
 
 class Player {
@@ -38,10 +39,11 @@ public:
 
     Move *doMove(Move *opponentsMove, int msLeft);
 
-    int updateHueristics(Board *board);
+    int updateHeuristics(Board *board);
     int superDumbSuperSimpleHeuristic(Board *board);
+    void updateMoves(Move *m);
     void updateOurMove(int index);
-    void updateTheirMove(Move *m)
+    void updateTheirMove(Move *m);
 
     int randomMove();
     int heuristicsAI();
@@ -55,13 +57,13 @@ public:
 
 private:
     // The Game Board
-    Board game_board*;
+    Board *game_board;
     // The Player's side
     Side player_side;
     // Valid moves
-    vector<Move> valid_moves;
+    std::vector<Move> valid_moves;
     // Occupied spaces
-    vector<Move *> occupied_spaces;
+    std::vector<Move *> occupied_spaces;
 };
 
 #endif

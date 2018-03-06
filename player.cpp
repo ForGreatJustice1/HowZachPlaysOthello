@@ -1,5 +1,14 @@
 #include "player.hpp"
 
+// Constants
+static const Move init_adj[] = {Move(2,2), Move(3,2), Move(4,2), Move(5,2),
+                                Move(2,3),                       Move(5,3),
+                                Move(2,4),                       Move(5,4),
+                                Move(2,5), Move(3,5), Move(4,5), Move(5,5)};
+
+static const short NUM_ADJACENT_INITIAL = 12;
+static const short NUM_ADJACENT_MOVE = 8;
+
 /*
  * Constructor for the player; initialize everything here. The side your AI is
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish
@@ -12,22 +21,15 @@ Player::Player(Side side) {
     testingMinimax = false;
 
     // Set the AI type
-    this->AI_type = RANDOM;
+    this->AI_type = RANDOM_AI;
 
     this->player_side = side;
     this->game_board = new Board();
 
-    // Initialize the vector of adjacents
-    static const Move init_adj[] = {Move(2,2), Move(3,2), Move(4,2), Move(5,2),
-                                    Move(2,3),                       Move(5,3),
-                                    Move(2,4),                       Move(5,4),
-                                    Move(2,5), Move(3,5), Move(4,5), Move(5,5)};
-    static const short NUM_ADJACENT_INITIAL = 12;
-    static const short NUM_ADJACENT_MOVE = 8;
-
     // Only keep valid moves and add to vector of valid moves
     for(short i = 0; i < NUM_ADJACENT_INITIAL; i++) {
-      if(this->game_board->checkMove(&init_adj[i], this->player_side)) {
+      Move m = Move(init_adj[i].x, init_adj[i].y);
+      if(this->game_board->checkMove(&m, this->player_side)) {
         this->valid_moves.push_back(init_adj[i]);
       }
     }
@@ -71,7 +73,7 @@ Player::~Player() {
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
-    Player::updateTheirMove(opponentsMove);
+    this->updateTheirMove(opponentsMove);
     int ourMoveIndex;
 
     // Figure out what AI to use
@@ -100,8 +102,8 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
       }
     }
 
-    Player::updateOurMove(ourMoveIndex);
-    return valid_moves[index];
+    this->updateOurMove(ourMoveIndex);
+    return &(this->valid_moves[ourMoveIndex]);
 }
 
 /**
@@ -118,11 +120,32 @@ int Player::randomMove() {
 }
 
 /**
+* @brief Uses heuristics to make the immediate best move.
+*
+*/
+int Player::heuristicsAI() {
+    int hScore = -10000;
+    int currentScore;
+    int hIndex;
+    for(int i = 0; i < (int)valid_moves.size(); i++) {
+      Board* newCopy = this->game_board->copy();
+      newCopy->doMove(&valid_moves[i], this->player_side);
+      currentScore = updateHeuristics(newCopy);
+      if(currentScore > hScore) {
+        hIndex = i;
+        hScore = currentScore;
+      }
+      delete newCopy;
+    }
+    return hIndex;
+}
+
+/**
  * @brief Makes a non-random move determined by using MiniMax.
  *
  */
-Move *Player::miniMax() {
-  return NULL;
+int Player::miniMax() {
+  return 0;
 }
 
 /**
@@ -143,9 +166,9 @@ void Player::updateOurMove(int index) {
                   Move(x-1,y),                Move(x+1,y),
                   Move(x-1,y+1), Move(x,y+1), Move(x+1,y+1)};
     for(short i = 0; i < NUM_ADJACENT_MOVE; i++) {
-      if(onBoard(&adj[i].getX(), &adj[i].getY())) {
+      if(game_board->onBoard(adj[i].getX(), adj[i].getY())) {
         if(game_board->checkMove(&adj[i], this->player_side)) {
-          this->valid_moves.pushback(adj[i]);
+          this->valid_moves.push_back(adj[i]);
         }
       }
     }
@@ -156,8 +179,8 @@ void Player::updateOurMove(int index) {
  *
  */
 void Player::updateTheirMove(Move *m) {
-    int x = m.getX();
-    int y = m.getY();
+    int x = m->getX();
+    int y = m->getY();
 
     // Update Move List
     this->updateMoves(new Move(x, y));
@@ -167,9 +190,9 @@ void Player::updateTheirMove(Move *m) {
                   Move(x-1,y),                Move(x+1,y),
                   Move(x-1,y+1), Move(x,y+1), Move(x+1,y+1)};
     for(short i = 0; i < NUM_ADJACENT_MOVE; i++) {
-      if(onBoard(&adj[i].getX(), &adj[i].getY())) {
+      if(game_board->onBoard(adj[i].getX(), adj[i].getY())) {
         if(game_board->checkMove(&adj[i], this->player_side)) {
-          this->valid_moves.pushback(adj[i]);
+          this->valid_moves.push_back(adj[i]);
         }
       }
     }
@@ -219,24 +242,3 @@ int Player::superDumbSuperSimpleHeuristic(Board *board) {
     }
     return board->countWhite() - board->countBlack();
 }
-
- /**
- * @brief Uses heuristics to make the immediate best move.
- *
- */
-int Player::heuristicsAI() {
-     int hScore = -10000;
-     int currentScore;
-     int hIndex;
-     for(int i = 0; i < valid_moves.size(); i++) {
-       Board newCopy = this->game_board->copy();
-       newCopy->doMove(valid_moves[i]);
-       currentScore = updateHeuristics(newCopy);
-       if(currentScore > hScore) {
-         hIndex = i;
-         hScore = currentScore;
-       }
-       delete newCopy;
-     }
-     return hIndex;
- }
