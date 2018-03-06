@@ -11,6 +11,9 @@ Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
 
+    // Set the AI type
+    this->AI_type = RANDOM;
+
     this->player_side = side;
     this->game_board = new Board();
 
@@ -67,11 +70,38 @@ Player::~Player() {
  * return nullptr.
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
-    /*
-     * TODO: Implement how moves your AI should play here. You should first
-     * process the opponent's opponents move before calculating your own move
-     */
-    return nullptr;
+
+    Player::updateTheirMove(opponentsMove);
+    int outMoveIndex;
+
+    // Figure out what AI to use
+    if(testingMinimax) {
+      outMoveIndex = this->miniMax();
+    }
+    else {
+      switch(this->AI_type) {
+        case RANDOM_AI:
+        {
+          outMoveIndex = this->randomMove();
+        }
+        case HEURISTIC_AI:
+        {
+          // TODO: Add HEURISTIC_AI function
+        }
+        case MINIMAX_AI:
+        {
+          outMoveIndex = this->miniMax();
+        }
+        default:
+        {
+          outMoveIndex = this->randomMove();
+          break;
+        }
+      }
+    }
+
+    Player::updateOurMove(outMoveIndex);
+    return ourMove;
 }
 
 /**
@@ -100,8 +130,14 @@ Move *Player::miniMax() {
  *
  */
 void Player::updateOurMove(int index) {
+
     int x = valid_moves[index].getX();
     int y = valid_moves[index].getY();
+
+    // Update Move List
+    this->updateMoves(new Move(x, y));
+
+    // Update Adj.
     valid_moves.erase(valid_moves.begin() + index);
     Move adj[] = {Move(x-1,y-1), Move(x,y-1), Move(x+1,y-1),
                   Move(x-1,y),                Move(x+1,y),
@@ -122,6 +158,11 @@ void Player::updateOurMove(int index) {
 void Player::updateTheirMove(Move *m) {
     int x = m.getX();
     int y = m.getY();
+
+    // Update Move List
+    this->updateMoves(new Move(x, y));
+
+    // Update adjacents
     Move adj[] = {Move(x-1,y-1), Move(x,y-1), Move(x+1,y-1),
                   Move(x-1,y),                Move(x+1,y),
                   Move(x-1,y+1), Move(x,y+1), Move(x+1,y+1)};
