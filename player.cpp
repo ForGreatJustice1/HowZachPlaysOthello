@@ -100,8 +100,14 @@ Move *Player::miniMax() {
  *
  */
 void Player::updateOurMove(int index) {
+
     int x = valid_moves[index].getX();
     int y = valid_moves[index].getY();
+
+    // Update Move List
+    this->updateMoves(new Move(x, y));
+
+    // Update Adj.
     valid_moves.erase(valid_moves.begin() + index);
     Move adj[] = {Move(x-1,y-1), Move(x,y-1), Move(x+1,y-1),
                   Move(x-1,y),                Move(x+1,y),
@@ -122,6 +128,11 @@ void Player::updateOurMove(int index) {
 void Player::updateTheirMove(Move *m) {
     int x = m.getX();
     int y = m.getY();
+
+    // Update Move List
+    this->updateMoves(new Move(x, y));
+
+    // Update adjacents
     Move adj[] = {Move(x-1,y-1), Move(x,y-1), Move(x+1,y-1),
                   Move(x-1,y),                Move(x+1,y),
                   Move(x-1,y+1), Move(x,y+1), Move(x+1,y+1)};
