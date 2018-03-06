@@ -189,7 +189,7 @@ void Player::updateMoves(Move *m) {
  *
  * @return The hueristic function's value given a board state.
  */
-int Player::updateHueristics(Board *board) {
+int Player::updateHeuristics(Board *board) {
     int our_score = 0;
     int their_score = 0;
     Side player = this->player_side;
@@ -198,14 +198,14 @@ int Player::updateHueristics(Board *board) {
       int x = this->occupied_spaces[i]->getX();
       int y = this->occupied_spaces[i]->getY();
       if(this->game_board->get(player, x, y)) {
-        our_score += HUERISTIC[x][y];
+        our_score += HEURISTIC[x][y];
       }
       else if(this->game_board->get(opponent, x, y)) {
-        their_score += HUERISTIC[x][y];
+        their_score += HEURISTIC[x][y];
       }
     }
 
-    return out_score - their_score;
+    return our_score - their_score;
 }
 
 /**
@@ -219,3 +219,25 @@ int Player::superDumbSuperSimpleHeuristic(Board *board) {
     }
     return board->countWhite() - board->countBlack();
 }
+
+ /**
+ * @brief Uses heuristics to make the immediate best move.
+ *
+ */
+ int Player::heuristicsAI(Move *theirMove) {
+     int hScore = -10000;
+     int currentScore;
+     int hIndex;
+     updateTheirMove(theirMove);
+     for(int i = 0; i < valid_moves.size(); i++) {
+       Board newCopy = this->game_board->copy();
+       newCopy->doMove(valid_moves[i]);
+       currentScore = updateHeuristics(newCopy);
+       if(currentScore > hScore) {
+         hIndex = i;
+         hScore = currentScore;
+       }
+       delete newCopy;
+     }
+     return hIndex;
+ }
