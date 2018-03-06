@@ -13,18 +13,18 @@ public:
     ~Player();
 
     Move *doMove(Move *opponentsMove, int msLeft);
-    void validMoves();
+    int randomMove();
+    Move *miniMax();
+    void updateOurMove(int index);
+    void updateTheirMove(Move *m)
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
 
 private:
-    // Game board pointer
     Board game_board*;
-    // The side of the player
     Side player_side;
-    // Valid moves
-    vector<Move> valid_moves;
+    vector<Move> adjacent_sq;
 };
 
 #endif

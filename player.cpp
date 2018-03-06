@@ -63,13 +63,13 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
  * @brief Makes a random move.
  *
  */
-Move *Player::randomMove() {
+int Player::randomMove() {
     /*
-     * Makes a ,,random,, move. Some moves are likelier to be made...don't
+     * Picks a ,,random,, move. Some moves are likelier to be made...don't
      * worry about it.
      */
-    int randIndex = rand() % adjacent_sq.size();
-    return adjacent_sq[randIndex];
+    int randIndex = rand() % valid_moves.size();
+    return randIndex;
 }
 
 /**
@@ -81,9 +81,22 @@ Move *Player::miniMax() {
 }
 
 /**
- * @brief Updates the list of valid adjacent moves.
+ * @brief Updates the list of valid adjacent moves after our move.
  *
  */
-void Player::updateValidMoves(Move *m, int index) {
+void Player::updateOurMove(int index) {
+    valid_moves.erase(valid_moves.begin() + index);
+    for(short i = 0; i < NUM_ADJACENT_INITIAL; i++) {
+      if(game_board->checkMove(&init_adj[i], this->player_side)) {
+        this->valid_moves.pushback(init_adj[i]);
+}
 
+/**
+ * @brief Updates the list of valid adjacent moves after their move.
+ *
+ */
+void Player::updateTheirMove(Move *m) {
+    for(short i = 0; i < NUM_ADJACENT_INITIAL; i++) {
+      if(game_board->checkMove(&init_adj[i], this->player_side)) {
+        this->valid_moves.pushback(init_adj[i]);
 }
