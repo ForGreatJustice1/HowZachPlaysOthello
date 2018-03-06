@@ -21,6 +21,15 @@ static const short HUERISTIC[NUM_OTHELLO_SQUARES][NUM_OTHELLO_SQUARES] =
   {  127, -064,  064,  064,  064,  064, -064,  127}
 };
 
+/**
+ * @brief Tells what type of AI to use.
+ */
+typedef enum AI {
+  RANDOM_AI;
+  HEURISTIC_AI;
+  MINIMAX_AI;
+} AI_t;
+
 class Player {
 
 public:
@@ -38,6 +47,8 @@ public:
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
+    // Type of AI to use normally
+    AI_t AI_type;
 
 private:
     // The Game Board

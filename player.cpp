@@ -11,6 +11,9 @@ Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
 
+    // Set the AI type
+    this->AI_type = RANDOM;
+
     this->player_side = side;
     this->game_board = new Board();
 
@@ -67,11 +70,38 @@ Player::~Player() {
  * return nullptr.
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
-    /*
-     * TODO: Implement how moves your AI should play here. You should first
-     * process the opponent's opponents move before calculating your own move
-     */
-    return nullptr;
+
+    Player::updateTheirMove(opponentsMove);
+    Move *outMove;
+
+    // Figure out what AI to use
+    if(testingMinimax) {
+      outMove = this->miniMax();
+    }
+    else {
+      switch(this->AI_type) {
+        case RANDOM_AI:
+        {
+          outMove = this->randomMove();
+        }
+        case HEURISTIC_AI:
+        {
+          // TODO: Add HEURISTIC_AI function
+        }
+        case MINIMAX_AI:
+        {
+          outMove = this->miniMax();
+        }
+        default:
+        {
+          outMove = this->randomMove();
+          break;
+        }
+      }
+    }
+
+    Player::updateOurMove(ourMove);
+    return ourMove;
 }
 
 /**
