@@ -20,6 +20,7 @@ Player::Player(Side side) {
                                     Move(2,4),                       Move(5,4),
                                     Move(2,5), Move(3,5), Move(4,5), Move(5,5)};
     static const short NUM_ADJACENT_INITIAL = 12;
+    static const short NUM_ADJACENT_MOVE = 8;
 
     // Only keep valid moves and add to vector of valid moves
     for(short i = 0; i < NUM_ADJACENT_INITIAL; i++) {
@@ -85,10 +86,19 @@ Move *Player::miniMax() {
  *
  */
 void Player::updateOurMove(int index) {
+    int x = valid_moves[index].getX();
+    int y = valid_moves[index].getY();
     valid_moves.erase(valid_moves.begin() + index);
-    for(short i = 0; i < NUM_ADJACENT_INITIAL; i++) {
-      if(game_board->checkMove(&init_adj[i], this->player_side)) {
-        this->valid_moves.pushback(init_adj[i]);
+    Move adj[] = {Move(x-1,y-1), Move(x,y-1), Move(x+1,y-1),
+                  Move(x-1,y),                Move(x+1,y),
+                  Move(x-1,y+1), Move(x,y+1), Move(x+1,y+1)};
+    for(short i = 0; i < NUM_ADJACENT_MOVE; i++) {
+      if(onBoard(&adj[i].getX(), &adj[i].getY())) {
+        if(game_board->checkMove(&adj[i], this->player_side)) {
+          this->valid_moves.pushback(adj[i]);
+        }
+      }
+    }
 }
 
 /**
@@ -96,7 +106,16 @@ void Player::updateOurMove(int index) {
  *
  */
 void Player::updateTheirMove(Move *m) {
-    for(short i = 0; i < NUM_ADJACENT_INITIAL; i++) {
-      if(game_board->checkMove(&init_adj[i], this->player_side)) {
-        this->valid_moves.pushback(init_adj[i]);
+    int x = m.getX();
+    int y = m.getY();
+    Move adj[] = {Move(x-1,y-1), Move(x,y-1), Move(x+1,y-1),
+                  Move(x-1,y),                Move(x+1,y),
+                  Move(x-1,y+1), Move(x,y+1), Move(x+1,y+1)};
+    for(short i = 0; i < NUM_ADJACENT_MOVE; i++) {
+      if(onBoard(&adj[i].getX(), &adj[i].getY())) {
+        if(game_board->checkMove(&adj[i], this->player_side)) {
+          this->valid_moves.pushback(adj[i]);
+        }
+      }
+    }
 }
