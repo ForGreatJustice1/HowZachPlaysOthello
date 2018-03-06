@@ -4,13 +4,13 @@
  * Constructor for the player; initialize everything here. The side your AI is
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish
  * within 30 seconds.
- * 
+ *
  * small change
  */
 Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
-    
+
     this->player_side = side;
     this->game_board = new Board();
 
@@ -19,8 +19,14 @@ Player::Player(Side side) {
                                     Move(2,3),                       Move(5,3),
                                     Move(2,4),                       Move(5,4),
                                     Move(2,5), Move(3,5), Move(4,5), Move(5,5)};
-    this->adjacent_sq = vector<Move>(init_adj,
-      init_adj + sizeof(init_adj)/sizeof(init_adj[0]));
+    static const short NUM_ADJACENT_INITIAL = 12;
+
+    // Only keep valid moves and add to vector of valid moves
+    for(short i = 0; i < NUM_ADJACENT_INITIAL; i++) {
+      if(game_board->checkMove(&init_adj[i], this->player_side)) {
+        this->valid_moves.pushback(init_adj[i]);
+      }
+    }
 
     return;
 }
@@ -58,7 +64,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
  *
  */
 Move *Player::randomMove() {
-    /* 
+    /*
      * Makes a ,,random,, move. Some moves are likelier to be made...don't
      * worry about it.
      */

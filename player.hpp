@@ -18,9 +18,12 @@ public:
     bool testingMinimax;
 
 private:
+    // Game board pointer
     Board game_board*;
+    // The side of the player
     Side player_side;
-    vector<Move> adjacent_sq;
+    // Valid moves
+    vector<Move> valid_moves;
 };
 
 #endif
