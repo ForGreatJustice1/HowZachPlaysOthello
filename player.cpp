@@ -23,8 +23,18 @@ Player::Player(Side side) {
 
     // Only keep valid moves and add to vector of valid moves
     for(short i = 0; i < NUM_ADJACENT_INITIAL; i++) {
-      if(game_board->checkMove(&init_adj[i], this->player_side)) {
-        this->valid_moves.pushback(init_adj[i]);
+      if(this->game_board->checkMove(&init_adj[i], this->player_side)) {
+        this->valid_moves.push_back(init_adj[i]);
+      }
+    }
+
+    // Initialize list of occupied spaces
+    for(short x = 0; x < NUM_OTHELLO_SQUARES; x++) {
+      for(short y = 0; y < NUM_OTHELLO_SQUARES; y++) {
+        if(this->game_board->get(WHITE, x, y) ||
+         this->game_board->get(BLACK, x, y)) {
+           this->occupied_spaces.push_back(new Move(x, y));
+         }
       }
     }
 
@@ -36,6 +46,10 @@ Player::Player(Side side) {
  */
 Player::~Player() {
     delete game_board;
+
+    for(int i = 0; i < (int)this->occupied_spaces.size(); i++) {
+      delete occupied_spaces[i];
+    }
 }
 
 /*
@@ -86,4 +100,37 @@ Move *Player::miniMax() {
  */
 void Player::updateAdjacents(Move *m) {
 
+}
+
+/**
+ * @brief Updates the moves list.
+ *
+ */
+void Player::updateMoves(Move *m) {
+    this->occupied_spaces.push_back(new Move(m->getX(), m->getY()));
+    return;
+}
+
+/**
+ * @brief Calculates the heuristic
+ *
+ * @return The hueristic function's value given a board state.
+ */
+int Player::updateHueristics(Board *board) {
+    int our_score = 0;
+    int their_score = 0;
+    Side player = this->player_side;
+    Side opponent = (this->player_side == BLACK)? WHITE : BLACK;
+    for(int i = 0; i < (int)this->occupied_spaces.size(); i++) {
+      int x = this->occupied_spaces[i]->getX();
+      int y = this->occupied_spaces[i]->getY();
+      if(this->game_board->get(player, x, y)) {
+        our_score += HUERISTIC[x][y];
+      }
+      else if(this->game_board->get(opponent, x, y)) {
+        their_score += HUERISTIC[x][y];
+      }
+    }
+
+    return out_score - their_score;
 }
