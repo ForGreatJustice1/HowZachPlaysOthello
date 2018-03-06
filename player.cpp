@@ -87,7 +87,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
     // Figure out what AI to use
     if(testingMinimax) {
-      ourMoveIndex = this->miniMax();
+      ourMoveIndex = this->miniMax(2);
     }
     else {
       switch(this->AI_type) {
@@ -103,7 +103,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
         }
         case MINIMAX_AI:
         {
-          ourMoveIndex = this->miniMax();
+          ourMoveIndex = this->miniMax(2);
           break;
         }
         case FLAT_AI:
@@ -189,21 +189,91 @@ int Player::flatEarthHeuristicAI() {
  * @brief Makes a non-random move determined by using MiniMax.
  *
  */
-int Player::miniMax(int depth) {
+int Player::miniMax(int ply) {
     int num_val_moves = this->valid_moves.size();
-    int min_score[num_val_moves];
+    std::vector<int> min_score;
 
     for(int i = 0; i < num_val_moves; i++) {
-      score[i] = 0;
+      min_score.push_back(65);
     }
 
-    return 0;
+    // Struct for doing the minimax calculations
+    typedef struct search_state {
+      int move_index;
+      Move next_move;
+      Board *board;
+      int depth;
+      bool player_turn;
+    } search_state_t;
+
+    std::vector<search_state_t> searches;
+
+    // Initialize the stack for searching through the moves
+    for(int i = 0; i < num_val_moves; i++) {
+
+      search_state_t state;
+      state.move_index = i;
+      state.next_move = this->valid_moves[i];
+      state.board = this->game_board->copy();
+      state.depth = 1;
+      state.player_turn = true;
+
+      searches.push_back(state);
+    }
+
+    // Go through moves
+    while(searches.size() > 0) {
+      search_state_t current_state = searches.pop_back();
+
+      Side s = (state.player_turn)? this->player_side : this->op_side;
+      current_state.board->doMove(&current_state.next_move, s);
+
+      // Case where we have reached the depth we want.
+      if(current_state.depth == ply) {
+        int score = this->superDumbSuperSimpleHeuristic(current_state.board);
+        if(score < min_score[current_state.move_index]) {
+          min_score[current_state.move_index] = score;
+        }
+      }
+      // Continue calculating
+      else {
+        Side next_side = (!state.player_turn)? this->player_side:this->op_side;
+        std::vector<Move> next_moves =
+          get_valid_moves(current_state.board, next_side);
+
+        for(int i = 0; i < next_moves.size(); i++) {
+          // Create all of the next states to look at and push them in.
+          search_state_t next_state;
+          next_state.move_index = current_state.move_index;
+          next_state.next_move = next_moves[i];
+          next_state.board = current_state.board->copy();
+          next_state.depth = current_state.depth + 1;
+          next_state.player_turn = !current_state.player_turn;
+
+          searches.push_back(next_state);
+        }
+      }
+
+      delete current_state.board;
+    }
+
+    // Maximize the minimums
+    int index = 0;
+    int min_max = min_score[0];
+    for(int i = 1; i < num_val_moves; i++) {
+      if(min_score[i] > min_max) {
+        index = i;
+        min_max = min_score[i];
+      }
+    }
+
+    return index;
 }
 
 /**
  * @brief Gets valid moves from a board.
  */
-std::vector<Move> get_valid_moves(Board *b, Side s) {
+std::vector<Move> Player::get_valid_moves(Board *b, Side s) {
     std::vector<Move> valid;
 
     for(short x = 0; x < NUM_OTHELLO_SQUARES; x++) {
