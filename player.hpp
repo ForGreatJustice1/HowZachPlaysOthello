@@ -44,6 +44,7 @@ public:
     void updateMoves(Move *m);
     void updateOurMove(int index);
     void updateTheirMove(Move *m);
+    void clearNeighborsFromMoves(int x, int y);
 
     int randomMove();
     int heuristicsAI();
@@ -60,6 +61,8 @@ private:
     Board *game_board;
     // The Player's side
     Side player_side;
+    // The Opponent's side
+    Side op_side;
     // Valid moves
     std::vector<Move> valid_moves;
     // Occupied spaces

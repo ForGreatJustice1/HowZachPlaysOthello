@@ -1,5 +1,7 @@
 #include "player.hpp"
 
+using namespace std;
+
 // Constants
 static const Move init_adj[] = {Move(2,2), Move(3,2), Move(4,2), Move(5,2),
                                 Move(2,3),                       Move(5,3),
@@ -24,6 +26,7 @@ Player::Player(Side side) {
     this->AI_type = RANDOM_AI;
 
     this->player_side = side;
+    this->op_side = (side == BLACK)? WHITE : BLACK;
     this->game_board = new Board();
 
     // Only keep valid moves and add to vector of valid moves
@@ -74,6 +77,12 @@ Player::~Player() {
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
     this->updateTheirMove(opponentsMove);
+
+    // Case where no valid moves.
+    if(valid_moves.size() == 0) {
+      return nullptr;
+    }
+
     int ourMoveIndex;
 
     // Figure out what AI to use
@@ -103,7 +112,11 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     }
 
     this->updateOurMove(ourMoveIndex);
-    return &(this->valid_moves[ourMoveIndex]);
+
+    // Copy the move and return pointer.
+    int move_x = this->valid_moves[ourMoveIndex].getX();
+    int move_y = this->valid_moves[ourMoveIndex].getY();
+    return new Move(move_x, move_y);
 }
 
 /**
@@ -157,21 +170,10 @@ void Player::updateOurMove(int index) {
     int x = valid_moves[index].getX();
     int y = valid_moves[index].getY();
 
-    // Update Move List
-    this->updateMoves(new Move(x, y));
-
-    // Update Adj.
-    valid_moves.erase(valid_moves.begin() + index);
-    Move adj[] = {Move(x-1,y-1), Move(x,y-1), Move(x+1,y-1),
-                  Move(x-1,y),                Move(x+1,y),
-                  Move(x-1,y+1), Move(x,y+1), Move(x+1,y+1)};
-    for(short i = 0; i < NUM_ADJACENT_MOVE; i++) {
-      if(game_board->onBoard(adj[i].getX(), adj[i].getY())) {
-        if(game_board->checkMove(&adj[i], this->player_side)) {
-          this->valid_moves.push_back(adj[i]);
-        }
-      }
-    }
+    // Update Move List and board
+    Move *m = new Move(x, y);
+    this->game_board->doMove(m, this->player_side);
+    this->updateMoves(m);
 }
 
 /**
@@ -179,21 +181,30 @@ void Player::updateOurMove(int index) {
  *
  */
 void Player::updateTheirMove(Move *m) {
-    int x = m->getX();
-    int y = m->getY();
+
+    // Clear valid moves
+    this->valid_moves.erase(valid_moves.begin(), valid_moves.end());
+
+    // Update moves
+    if(m != nullptr) {
+
+      int x = m->getX();
+      int y = m->getY();
+
+      Move *move = new Move(x, y);
+      this->game_board->doMove(move, this->op_side);
+      this->updateMoves(move);
+    }
 
     // Update Move List
-    this->updateMoves(new Move(x, y));
 
-    // Update adjacents
-    Move adj[] = {Move(x-1,y-1), Move(x,y-1), Move(x+1,y-1),
-                  Move(x-1,y),                Move(x+1,y),
-                  Move(x-1,y+1), Move(x,y+1), Move(x+1,y+1)};
-    for(short i = 0; i < NUM_ADJACENT_MOVE; i++) {
-      if(game_board->onBoard(adj[i].getX(), adj[i].getY())) {
-        if(game_board->checkMove(&adj[i], this->player_side)) {
-          this->valid_moves.push_back(adj[i]);
+    for(short x = 0; x < NUM_OTHELLO_SQUARES; x++) {
+      for(short y = 0; y < NUM_OTHELLO_SQUARES; y++) {
+        Move *m = new Move(x, y);
+        if(this->game_board->checkMove(m, this->player_side)) {
+           this->valid_moves.push_back(Move(x, y));
         }
+        delete m;
       }
     }
 }
@@ -216,7 +227,7 @@ int Player::updateHeuristics(Board *board) {
     int our_score = 0;
     int their_score = 0;
     Side player = this->player_side;
-    Side opponent = (this->player_side == BLACK)? WHITE : BLACK;
+    Side opponent = this->op_side;
     for(int i = 0; i < (int)this->occupied_spaces.size(); i++) {
       int x = this->occupied_spaces[i]->getX();
       int y = this->occupied_spaces[i]->getY();
