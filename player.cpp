@@ -189,8 +189,34 @@ int Player::flatEarthHeuristicAI() {
  * @brief Makes a non-random move determined by using MiniMax.
  *
  */
-int Player::miniMax() {
-  return 0;
+int Player::miniMax(int depth) {
+    int num_val_moves = this->valid_moves.size();
+    int min_score[num_val_moves];
+
+    for(int i = 0; i < num_val_moves; i++) {
+      score[i] = 0;
+    }
+
+    return 0;
+}
+
+/**
+ * @brief Gets valid moves from a board.
+ */
+std::vector<Move> get_valid_moves(Board *b, Side s) {
+    std::vector<Move> valid;
+
+    for(short x = 0; x < NUM_OTHELLO_SQUARES; x++) {
+      for(short y = 0; y < NUM_OTHELLO_SQUARES; y++) {
+        Move *m = new Move(x, y);
+        if(b->checkMove(m, s)) {
+           valid.push_back(Move(x, y));
+        }
+        delete m;
+      }
+    }
+
+    return valid;
 }
 
 /**
@@ -214,9 +240,6 @@ void Player::updateOurMove(int index) {
  */
 void Player::updateTheirMove(Move *m) {
 
-    // Clear valid moves
-    this->valid_moves.erase(valid_moves.begin(), valid_moves.end());
-
     // Update moves
     if(m != nullptr) {
 
@@ -229,16 +252,7 @@ void Player::updateTheirMove(Move *m) {
     }
 
     // Update Move List
-
-    for(short x = 0; x < NUM_OTHELLO_SQUARES; x++) {
-      for(short y = 0; y < NUM_OTHELLO_SQUARES; y++) {
-        Move *m = new Move(x, y);
-        if(this->game_board->checkMove(m, this->player_side)) {
-           this->valid_moves.push_back(Move(x, y));
-        }
-        delete m;
-      }
-    }
+    this->valid_moves = get_valid_moves(this->game_board, this->player_side);
 }
 
 /**

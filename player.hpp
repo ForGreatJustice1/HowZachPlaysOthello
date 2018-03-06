@@ -39,6 +39,7 @@ public:
 
     int updateHeuristics(Board *board, vector<Move *> token_spaces);
     int superDumbSuperSimpleHeuristic(Board *board);
+    std::vector<Move> get_valid_moves(Board *b, Side s);
     void updateMoves(Move *m);
     void updateOurMove(int index);
     void updateTheirMove(Move *m);
@@ -48,7 +49,7 @@ public:
     int randomMove();
     int heuristicsAI();
     int flatEarthHeuristicAI();
-    int miniMax();
+    int miniMax(int depth);
 
 
     // Flag to tell if the player is running within the test_minimax context
