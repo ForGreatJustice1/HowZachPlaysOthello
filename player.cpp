@@ -62,7 +62,7 @@ Player::Player(Side side, Board *b) {
     testingMinimax = false;
 
     // Set the AI type
-    this->AI_type = HEURISTIC_AI;
+    this->AI_type = MINIMAX_AI;
 
     this->player_side = side;
     this->op_side = (side == BLACK)? WHITE : BLACK;
@@ -273,7 +273,6 @@ int Player::miniMax(int ply) {
       // Case where we have reached the depth we want.
       if(current_state.depth == ply) {
         int score = this->superDumbSuperSimpleHeuristic(current_state.board);
-        std::cerr << score << '\n';
         if(score < min_score[current_state.move_index]) {
           min_score[current_state.move_index] = score;
         }
