@@ -51,6 +51,45 @@ Player::Player(Side side) {
 }
 
 /*
+ * Constructor for the player; initialize everything here. The side your AI is
+ * on (BLACK or WHITE) is passed in as "side". The constructor must finish
+ * within 30 seconds.
+ *
+ * small change
+ */
+Player::Player(Side side, Board *b) {
+    // Will be set to true in test_minimax.cpp.
+    testingMinimax = false;
+
+    // Set the AI type
+    this->AI_type = HEURISTIC_AI;
+
+    this->player_side = side;
+    this->op_side = (side == BLACK)? WHITE : BLACK;
+    this->game_board = b;
+
+    // Only keep valid moves and add to vector of valid moves
+    for(short i = 0; i < NUM_ADJACENT_INITIAL; i++) {
+      Move m = Move(init_adj[i].x, init_adj[i].y);
+      if(this->game_board->checkMove(&m, this->player_side)) {
+        this->valid_moves.push_back(init_adj[i]);
+      }
+    }
+
+    // Initialize list of occupied spaces
+    for(short x = 0; x < NUM_OTHELLO_SQUARES; x++) {
+      for(short y = 0; y < NUM_OTHELLO_SQUARES; y++) {
+        if(this->game_board->get(WHITE, x, y) ||
+         this->game_board->get(BLACK, x, y)) {
+           this->occupied_spaces.push_back(new Move(x, y));
+         }
+      }
+    }
+
+    return;
+}
+
+/*
  * Destructor for the player.
  */
 Player::~Player() {
@@ -87,6 +126,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
     // Figure out what AI to use
     if(testingMinimax) {
+
       ourMoveIndex = this->miniMax(2);
     }
     else {
@@ -233,6 +273,7 @@ int Player::miniMax(int ply) {
       // Case where we have reached the depth we want.
       if(current_state.depth == ply) {
         int score = this->superDumbSuperSimpleHeuristic(current_state.board);
+        std::cerr << score << '\n';
         if(score < min_score[current_state.move_index]) {
           min_score[current_state.move_index] = score;
         }
